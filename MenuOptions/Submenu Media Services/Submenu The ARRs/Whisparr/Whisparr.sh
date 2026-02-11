@@ -10,7 +10,7 @@
 source /opt/ibracorp/ibramenu/ibrafunc.sh
 
 # App Info
-app="whiasparr"                                # App Name
+app="whisparr"                                 # App Name
 title="Whisparr"                               # Readable App Title
 image="ghcr.io/hotio/whisparr"    # Image and Tag
 volumes="    volumes:

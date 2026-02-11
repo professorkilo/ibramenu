@@ -15,7 +15,7 @@ install_tools () {
    # Python 3 (pip)
    apt install python3-pip -y
    # Pip psutil
-   apt-get install gcc python3-dev
+   apt-get install gcc python3-dev -y
    pip install --no-binary :all: psutil
    # Google Download
    pip3 install gdown

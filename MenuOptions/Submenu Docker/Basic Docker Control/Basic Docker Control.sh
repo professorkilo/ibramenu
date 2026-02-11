@@ -68,9 +68,8 @@ docker_control() {
     cd /opt/appdata
     for file in *; do
         msgbox "Docker Container $file"
-        docker_c=("$docker_c[@]}" "$file")
         if [ -d "$file" ]; then
-            cd $file
+            cd "$file"
             docker compose $1
             cd ..
         fi

@@ -30,6 +30,18 @@ if [ "$skip_packages" -ne 1 ]; then
   apt update
   apt install sudo curl git ruby ruby-dev build-essential -y
   gem install mdless --no-document
+
+  # Install Docker if not already present
+  if ! command -v docker >/dev/null 2>&1; then
+    apt-get install ca-certificates curl gnupg lsb-release -y
+    sudo rm -f /usr/share/keyrings/docker-archive-keyring.gpg
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+    apt-get update
+    apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+    groupadd docker 2>/dev/null || true
+    usermod -aG docker "${SUDO_USER:-$USER}"
+  fi
 fi
 git clone -b "$clone_branch" --single-branch "$clone_source" "$ifolder"
 find "$ifolder" -type f -iname "*.sh" -exec chmod +x {} \;

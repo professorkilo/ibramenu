@@ -30,7 +30,7 @@ menu_from_array() {
       break
       ;;
     b | B)
-      if [ "$PWD/" = $menu_entry_point ]; then
+      if [ "$PWD/" = "$menu_entry_point" ]; then
         read -p "Already at Top Menu. Press enter to continue..."
         break
       else
@@ -68,7 +68,7 @@ execute_script() {
 }
 
 # Define Variables
-if [ $1 ]; then
+if [ -n "${1-}" ]; then
   menu_entry_point="$1"
 else
   menu_entry_point="/opt/ibracorp/ibramenu/MenuOptions/"
@@ -85,7 +85,8 @@ environment_check
 ibramotd
 
 # Menu
-until [ $REPLY = x ] || [ $REPLY = X ]; do
+REPLY=""
+until [ "$REPLY" = x ] || [ "$REPLY" = X ]; do
   ibralogo
   checkupdate
   unset menu_choice

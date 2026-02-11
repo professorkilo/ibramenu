@@ -31,8 +31,8 @@ extrapayload="    environment:
 
 appcreate_local() {
     msgbox "Installing $title..."
-    mkdir -p /opt/appdata/$app && cd /opt/appdata/$app
-    rm compose.yaml
+    mkdir -p "/opt/appdata/$app" && cd "/opt/appdata/$app"
+    rm -f compose.yaml
     tee <<-EOF >.env
 APP_NAME=$app
 IMAGE=$image

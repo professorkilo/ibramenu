@@ -10,7 +10,9 @@
 
 # profile file
 source /opt/ibracorp/ibramenu/.profile
-source /opt/appdata/.traefik.env
+if [ -f /opt/appdata/.traefik.env ]; then
+  source /opt/appdata/.traefik.env
+fi
 
 if [[ -n "${IBRAMENU_DOCKER_NETWORK:-}" ]]; then
   dockernet="$IBRAMENU_DOCKER_NETWORK"
@@ -128,7 +130,7 @@ $stamp
 EOF
       ;;
     *)
-      echo "IBRACROP Disclaimer has not been accepted. Exiting..."
+      echo "IBRACORP Disclaimer has not been accepted. Exiting..."
       echo
       exit 0
       ;;
@@ -181,7 +183,7 @@ environment_check() {
 # launch docker compose container
 launchdocker() {
   target_folder=$1
-  if [ ! -d $target_folder ]; then
+  if [ ! -d "$target_folder" ]; then
     mkdir -p "$target_folder"
   fi
   cp -R * "$target_folder"
@@ -216,26 +218,26 @@ checkupdate() {
 
 # IBRACORP motd
 ibramotd() {
-  chmod -x /etc/update-motd.d/*
-  tee <<-'EOF' >/etc/update-motd.d/01-ibracorp
+  if [ -d /etc/update-motd.d ]; then
+    chmod -x /etc/update-motd.d/* 2>/dev/null || true
+  fi
+  cat >/etc/update-motd.d/01-ibracorp <<'MOTDSCRIPT'
 #!/bin/bash
 ######################################################################
 # Title   : IBRACORP MOTD
 # By      : Sycotix, DiscDuck, Taos15
 # License : General Public License GPL-3.0-or-later
-# Another fine product brought to you by IBRACORP   ^d
+# Another fine product brought to you by IBRACORP
 ######################################################################
-tee <<-EOF
-  ___ ____  ____      _    ____ ___  ____  ____     (tm)
- |_ _| __ )|  _ \    / \  / ___/ _ \|  _ \|  _ \
-  | ||  _ \| |_) |  / _ \| |  | | | | |_) | |_) |
-  | || |_) |  _ <  / ___ \ |__| |_| |  _ <|  __/
- |___|____/|_| \_\/_/   \_\____\___/|_| \_\_|
-$(lsb_release -sd) | CPU Threads: $(lscpu | grep "CPU(s):" | tail +1 | head -1 | awk  '{print $2}') | IP: $(hostname -I | awk '{print $1}') | RAM: $(free -m | grep Mem | awk 'NR=1 {print $2}') MB
-Become a Member and sponsor us: https://ibracorp.io/memberships
-Type 'ibramenu' to launch IBRAMENU.
-EOF
-  echo "EOF" >>/etc/update-motd.d/01-ibracorp
+echo "  ___ ____  ____      _    ____ ___  ____  ____     (tm)"
+echo " |_ _| __ )|  _ \    / \  / ___/ _ \|  _ \|  _ \ "
+echo "  | ||  _ \| |_) |  / _ \| |  | | | | |_) | |_) |"
+echo "  | || |_) |  _ <  / ___ \ |__| |_| |  _ <|  __/ "
+echo " |___|____/|_| \_\/_/   \_\____\___/|_| \_\_|    "
+echo "$(lsb_release -sd 2>/dev/null || echo Linux) | CPU Threads: $(nproc) | IP: $(hostname -I | awk '{print $1}') | RAM: $(free -m | awk '/Mem/{print $2}') MB"
+echo "Become a Member and sponsor us: https://ibracorp.io/memberships"
+echo "Type 'ibramenu' to launch IBRAMENU."
+MOTDSCRIPT
   chmod +x /etc/update-motd.d/01-ibracorp
 }
 
@@ -248,7 +250,7 @@ appgreetings() {
 # App
 appcreate() {
   msgbox "Installing $title..."
-  mkdir -p /opt/appdata/$app && cd /opt/appdata/$app
+  mkdir -p "/opt/appdata/$app" && cd "/opt/appdata/$app"
   tee <<-EOF >.env
 APP_NAME=$app
 IMAGE=$image
